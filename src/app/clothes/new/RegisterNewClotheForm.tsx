@@ -131,15 +131,7 @@ export default function RegisterClothingForm() {
                 </SelectItem>
               ))}
             </Select>
-            {/* Campo para el Color */}
-            <Input
-              defaultValue=""
-              label="Color"
-              variant="bordered"
-              {...register("color")}
-              isInvalid={!!errors.color}
-              errorMessage={errors.color?.message as string}
-            />
+ 
             {/* Botón de Enviar */}
             <Button
               fullWidth

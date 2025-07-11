@@ -4,21 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { getAuthUserId } from './authActions'; // Asumiendo que esta función existe para obtener el ID del usuario autenticado
 import { ClothingItemSchema } from '@/lib/schemas/ClothingItemSchema'; // Importa el esquema que acabas de crear
 import { ActionResult } from '@/types'; // Asumiendo que tienes este tipo definido para tus acciones de servidor
+import { ClothingItem, ClothingStatus } from '@prisma/client';
 
-export async function getAvailableClothes() {
-  try {
-    return prisma.clothingItem.findMany({
-      where: {
-        status: 'AVAILABLE',
-      },
-      // Puedes añadir `take` y `skip` aquí para paginación si es necesario
-    });
-  } catch (error) {
-    console.error("Error al obtener prendas disponibles:", error);
-    // Podrías lanzar el error o devolver null/undefined dependiendo de tu manejo de errores
-    throw error;
-  }
-}
 export async function registerClothingItem(data: ClothingItemSchema): Promise<ActionResult<string>> {
   try {
     // Obtiene el ID del usuario autenticado. Si no hay usuario, lanza un error.
@@ -56,3 +43,74 @@ export async function registerClothingItem(data: ClothingItemSchema): Promise<Ac
   }
 }
 
+// Definiciones de Tipos (asegúrate de que estén en un archivo accesible, quizás src/types.ts o directamente aquí)
+export type GetClothesParams = {
+  pageNumber?: string;
+  pageSize?: string;
+  orderBy?: 'createdAt' | 'updatedAt' | 'name'; // Agregamos 'name' como opción de ordenamiento
+  category?: string;
+  size?: string;
+};
+
+export type PaginatedResponse<T> = {
+  items: T[];
+  totalCount: number;
+};
+export async function getAvailableClothes({
+  pageNumber = '1',
+  pageSize = '12',
+  orderBy = 'createdAt',
+  category,
+  size,
+}: GetClothesParams): Promise<PaginatedResponse<ClothingItem>> {
+  const userId = await getAuthUserId(); // Obtener el ID del usuario autenticado
+
+  const page = parseInt(pageNumber);
+  const limit = parseInt(pageSize);
+  const skip = (page - 1) * limit;
+
+  try {
+    const clothesWhere = {
+      AND: [
+        { status: ClothingStatus.AVAILABLE }, // ¡CORREGIDO: Usando el enum directamente!
+        {
+          NOT: {
+            member: {
+              userId,
+            },
+          },
+        },
+        ...(category ? [{ category: category }] : []),
+        ...(size ? [{ size: size }] : []),
+      ],
+    };
+
+    const count = await prisma.clothingItem.count({ where: clothesWhere });
+
+    const clothes = await prisma.clothingItem.findMany({
+      where: clothesWhere,
+      include: {
+        member: {
+          select: {
+            userId: true,
+            name: true,
+            city: true,
+            country: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: { [orderBy]: 'desc' },
+      skip,
+      take: limit,
+    });
+
+    return {
+      items: clothes,
+      totalCount: count,
+    };
+  } catch (error) {
+    console.error("Error al obtener prendas disponibles:", error);
+    throw error;
+  }
+}

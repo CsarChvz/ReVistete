@@ -114,7 +114,9 @@ model ClothingItem {
   size          String?
   condition     String?
   imageUrl      String?
-  status        ClothingStatus  @default(AVAILABLE) // ¡Este es el campo que define el estatus!
+  status        ClothingStatus  @default(AVAILABLE)
+  createdAt     DateTime        @default(now()) // <-- ¡AGREGADO!
+  updatedAt     DateTime        @updatedAt    // <-- ¡AGREGADO!
   memberId      String
   member        Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
   offeredIn     ExchangeOffer[] @relation("offeredItems")
