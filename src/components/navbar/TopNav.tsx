@@ -21,7 +21,7 @@ export default async function TopNav() {
   const memberLinks = [
     { href: "/clothes", label: "Clothes" },
     { href: "/exchange/my-offers", label: "My Offers" },
-    { href: "/", label: "Messages" },
+    { href: "/members/inventory", label: "My Inventory" },
   ];
 
   const adminLinks = [
