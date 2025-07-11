@@ -19,7 +19,7 @@ export default async function TopNav() {
     session?.user && (await getUserInfoForNav());
 
   const memberLinks = [
-    { href: "/members", label: "Matches" },
+    { href: "/clothes", label: "Matches" },
     { href: "/lists", label: "Lists" },
     { href: "/messages", label: "Messages" },
   ];

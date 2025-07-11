@@ -73,13 +73,15 @@ export async function getAvailableClothes({
     const clothesWhere = {
       AND: [
         { status: ClothingStatus.AVAILABLE }, // ¡CORREGIDO: Usando el enum directamente!
-        {
-          NOT: {
-            member: {
-              userId,
-            },
-          },
-        },
+        // {
+        //   NOT: {
+        //     member: {
+        //       userId,
+        //     },
+        //   },
+        // },
+
+        // @TODO: Descomentar esto
         ...(category ? [{ category: category }] : []),
         ...(size ? [{ size: size }] : []),
       ],
@@ -111,6 +113,75 @@ export async function getAvailableClothes({
     };
   } catch (error) {
     console.error("Error al obtener prendas disponibles:", error);
+    throw error;
+  }
+}
+
+export async function getUserClothingInventory(
+  userId: string,
+  { pageNumber = '1', pageSize = '12' }: { pageNumber?: string; pageSize?: string }
+): Promise<PaginatedResponse<ClothingItem>> {
+  const page = parseInt(pageNumber);
+  const limit = parseInt(pageSize);
+  const skip = (page - 1) * limit;
+
+  try {
+    const whereClause = {
+      member: {
+        userId: userId,
+      },
+    };
+
+    const count = await prisma.clothingItem.count({ where: whereClause });
+
+    const userClothes = await prisma.clothingItem.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      // Incluye la información del miembro si la necesitas en el ClothingCard para el inventario del propio usuario
+      // include: {
+      //   member: {
+      //     select: {
+      //       name: true,
+      //       // ...otros campos si son necesarios
+      //     },
+      //   },
+      // },
+    });
+
+    return {
+      items: userClothes,
+      totalCount: count,
+    };
+  } catch (error) {
+    console.error(`Error al obtener el inventario de ropa del usuario ${userId}:`, error);
+    throw error;
+  }
+}
+
+// 2. getClothingDetails (modificado para incluir fotos)
+export async function getClothingDetails(clotheId: string) {
+  try {
+    return prisma.clothingItem.findUnique({
+      where: {
+        id: clotheId,
+      },
+      include: {
+        member: { // Incluimos el miembro dueño de la prenda
+          select: {
+            userId: true,
+            name: true,
+            city: true,
+            country: true,
+            image: true,
+          },
+        },
+        // Si tienes un modelo de Photo específicamente para ClothingItem, inclúyelo así:
+        // photos: true, // Asumiendo que ClothingItem tiene una relación 'photos'
+      },
+    });
+  } catch (error) {
+    console.error(`Error al obtener detalles de la prenda ${clotheId}:`, error);
     throw error;
   }
 }
