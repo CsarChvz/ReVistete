@@ -2,9 +2,9 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { getExchangeOfferDetails } from '@/app/actions/exchangeActions';
-import { getAuthUserId } from '@/app/actions/authActions'; // Para obtener el ID del usuario autenticado
+import { getAuthUserId } from '@/app/actions/authActions';
 import EmptyState from '@/components/EmptyState';
-import ExchangeDetailClientCard from './ExchangeDetailClientCard'; // Nuestro componente cliente
+import ExchangeDetailClientCard from './ExchangeDetailClientCard';
 
 type Props = {
   params: {
@@ -22,7 +22,8 @@ export default async function ExchangeDetailsPage({ params }: Props) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <ExchangeDetailClientCard offer={offer} currentUserId={currentUserId} />
+      {/* CORRECCIÓN AQUÍ: Pasa la prop como 'initialOffer' */}
+      <ExchangeDetailClientCard initialOffer={offer} currentUserId={currentUserId} />
     </div>
   );
 }

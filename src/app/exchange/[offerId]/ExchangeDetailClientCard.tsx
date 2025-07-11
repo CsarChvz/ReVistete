@@ -6,7 +6,7 @@ import {
   rejectExchangeOffer,
   cancelExchangeOffer,
   completeExchangeOffer,
-  getExchangeOfferDetails // Para refrescar los datos después de una acción
+  getExchangeOfferDetails
 } from '@/app/actions/exchangeActions';
 import { useRouter } from 'next/navigation';
 import { Button, Card, CardBody, CardFooter, Image, Divider, Spinner } from '@nextui-org/react';
@@ -19,29 +19,43 @@ import MemberLink from '@/components/MemberLink';
 type ExchangeOfferWithRelations = ExchangeOffer & {
   offeringMember: { userId: string; name: string; image: string | null; city: string; country: string; } | null;
   receivingMember: { userId: string; name: string; image: string | null; city: string; country: string; } | null;
-  offeredItem: { id: string; name: string; imageUrl: string | null; status: string; member: { userId: string; name: string; } | null; } | null;
-  requestedItem: { id: string; name: string; imageUrl: string | null; status: string; member: { userId: string; name: string; } | null; } | null;
+  // CORRECCIÓN AQUÍ: Añade category y size a offeredItem y requestedItem
+  offeredItem: {
+    id: string;
+    name: string;
+    imageUrl: string | null;
+    status: string;
+    category: string | null; // <-- AGREGADO
+    size: string | null;     // <-- AGREGADO
+    member: { userId: string; name: string; } | null;
+  } | null;
+  requestedItem: {
+    id: string;
+    name: string;
+    imageUrl: string | null;
+    status: string;
+    category: string | null; // <-- AGREGADO
+    size: string | null;     // <-- AGREGADO
+    member: { userId: string; name: string; } | null;
+  } | null;
 };
 
 type Props = {
-  offer: ExchangeOfferWithRelations;
+  initialOffer: ExchangeOfferWithRelations;
   currentUserId: string | null;
 };
 
-export default function ExchangeDetailClientCard({ initialOffer, currentUserId }: { initialOffer: ExchangeOfferWithRelations, currentUserId: string | null }) {
+export default function ExchangeDetailClientCard({ initialOffer, currentUserId }: Props) {
   const [offer, setOffer] = useState<ExchangeOfferWithRelations>(initialOffer);
   const [actionLoading, setActionLoading] = useState(false);
   const router = useRouter();
 
-  // Calcular roles y acciones permitidas
   const isOfferingMember = offer.offeringMember?.userId === currentUserId;
   const isReceivingMember = offer.receivingMember?.userId === currentUserId;
 
   const canAcceptOrReject = isReceivingMember && offer.status === ExchangeStatus.PENDING;
   const canCancel = isOfferingMember && offer.status === ExchangeStatus.PENDING;
-  // Solo se puede completar si está aceptada y es uno de los dos miembros involucrados
   const canComplete = (isOfferingMember || isReceivingMember) && offer.status === ExchangeStatus.ACCEPTED;
-
 
   const handleAction = async (action: 'accept' | 'reject' | 'cancel' | 'complete') => {
     setActionLoading(true);
@@ -71,13 +85,12 @@ export default function ExchangeDetailClientCard({ initialOffer, currentUserId }
       }
 
       if (updatedOffer) {
-        // Refrescar los datos de la oferta en el estado local
         const refetchedOffer = await getExchangeOfferDetails(offer.id);
         if (refetchedOffer) {
-          setOffer(refetchedOffer as ExchangeOfferWithRelations); // Casting para asegurar el tipo
+          setOffer(refetchedOffer as ExchangeOfferWithRelations);
         }
         toast.success(message);
-        router.refresh(); // Para revalidar el cache de datos en el lado del servidor y reflejar cambios en otras páginas
+        router.refresh();
       }
     } catch (error: any) {
       console.error(`Error al ${action} la oferta:`, error);
@@ -122,6 +135,7 @@ export default function ExchangeDetailClientCard({ initialOffer, currentUserId }
               className="object-cover w-full h-56 rounded-lg mb-4"
             />
             <h3 className="text-2xl font-semibold text-center">{offer.offeredItem?.name || 'Prenda Desconocida'}</h3>
+            {/* Ahora category y size existen en el tipo */}
             <p className="text-lg text-gray-600 mt-1">{offer.offeredItem?.category || ''} - {offer.offeredItem?.size || ''}</p>
             <p className="text-sm text-neutral-500 mt-2 text-center">
               De: <MemberLink memberId={offer.offeringMember?.userId || ''} name={offer.offeringMember?.name || 'Desconocido'} />
@@ -143,6 +157,7 @@ export default function ExchangeDetailClientCard({ initialOffer, currentUserId }
               className="object-cover w-full h-56 rounded-lg mb-4"
             />
             <h3 className="text-2xl font-semibold text-center">{offer.requestedItem?.name || 'Prenda Desconocida'}</h3>
+            {/* Ahora category y size existen en el tipo */}
             <p className="text-lg text-gray-600 mt-1">{offer.requestedItem?.category || ''} - {offer.requestedItem?.size || ''}</p>
             <p className="text-sm text-neutral-500 mt-2 text-center">
               De: <MemberLink memberId={offer.receivingMember?.userId || ''} name={offer.receivingMember?.name || 'Desconocido'} />
