@@ -71,25 +71,28 @@ export async function getMembers({
 export async function getMemberByUserId(userId: string) {
   try {
     return prisma.member.findUnique({
-      where: {
-        userId: userId,
-      },
-      // Selecciona los campos que necesites, incluyendo el ID del miembro
+      where: { userId: userId }, // Asume que 'userId' es el campo único en tu modelo Member
+      // INCLUIR TODOS LOS CAMPOS QUE MemberSidebar ESPERA
       select: {
-        id: true, // ¡Importante! Este es el ID del Member, no el userId
-        userId: true, // El ID del User, que usamos para las relaciones en ExchangeOffer
+        id: true,
+        userId: true,
         name: true,
-        image: true,
+        gender: true,          // <-- Asegúrate de incluirlo
+        dateOfBirth: true,     // <-- Asegúrate de incluirlo
+        created: true,         // <-- Asegúrate de incluirlo
+        updated: true,         // <-- Asegúrate de incluirlo
+        description: true,     // <-- Asegúrate de incluirlo
         city: true,
         country: true,
-      }
+        image: true,
+        // ... cualquier otro campo que necesites en MemberSidebar
+      },
     });
   } catch (error) {
-    console.error(`Error al obtener el miembro por userId ${userId}:`, error);
+    console.error(`Error al obtener miembro por ID de usuario ${userId}:`, error);
     return null;
   }
 }
-
 export async function getMemberPhotosByUserId(userId: string) {
     const currentUserId = await getAuthUserId();
 
