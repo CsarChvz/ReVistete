@@ -1,4 +1,10 @@
 -- CreateEnum
+CREATE TYPE "ClothingStatus" AS ENUM ('AVAILABLE', 'EXCHANGED', 'UNAVAILABLE');
+
+-- CreateEnum
+CREATE TYPE "ExchangeStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELED', 'COMPLETED');
+
+-- CreateEnum
 CREATE TYPE "TokenType" AS ENUM ('VERIFICATION', 'PASSWORD_RESET');
 
 -- CreateEnum
@@ -58,6 +64,7 @@ CREATE TABLE "Photo" (
     "id" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "publicId" TEXT,
+    "isApproved" BOOLEAN NOT NULL DEFAULT false,
     "memberId" TEXT NOT NULL,
 
     CONSTRAINT "Photo_pkey" PRIMARY KEY ("id")
@@ -96,6 +103,37 @@ CREATE TABLE "Token" (
     CONSTRAINT "Token_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ClothingItem" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "category" TEXT,
+    "size" TEXT,
+    "condition" TEXT,
+    "imageUrl" TEXT,
+    "status" "ClothingStatus" NOT NULL DEFAULT 'AVAILABLE',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "memberId" TEXT NOT NULL,
+
+    CONSTRAINT "ClothingItem_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ExchangeOffer" (
+    "id" TEXT NOT NULL,
+    "offeringMemberId" TEXT NOT NULL,
+    "receivingMemberId" TEXT NOT NULL,
+    "offeredItemId" TEXT NOT NULL,
+    "requestedItemId" TEXT NOT NULL,
+    "status" "ExchangeStatus" NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ExchangeOffer_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provider", "providerAccountId");
 
@@ -128,3 +166,18 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("sende
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_recipientId_fkey" FOREIGN KEY ("recipientId") REFERENCES "Member"("userId") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ClothingItem" ADD CONSTRAINT "ClothingItem_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ExchangeOffer" ADD CONSTRAINT "ExchangeOffer_offeringMemberId_fkey" FOREIGN KEY ("offeringMemberId") REFERENCES "Member"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ExchangeOffer" ADD CONSTRAINT "ExchangeOffer_receivingMemberId_fkey" FOREIGN KEY ("receivingMemberId") REFERENCES "Member"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ExchangeOffer" ADD CONSTRAINT "ExchangeOffer_offeredItemId_fkey" FOREIGN KEY ("offeredItemId") REFERENCES "ClothingItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ExchangeOffer" ADD CONSTRAINT "ExchangeOffer_requestedItemId_fkey" FOREIGN KEY ("requestedItemId") REFERENCES "ClothingItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
