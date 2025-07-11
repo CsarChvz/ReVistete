@@ -21,7 +21,7 @@ export default function SocialLogin() {
     provider: "google" | "github"
   ) => {
     signIn(provider, {
-      callbackUrl: "/members",
+      callbackUrl: "/clothes",
     });
   };
 

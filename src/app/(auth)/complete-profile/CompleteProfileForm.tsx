@@ -35,7 +35,7 @@ export default function CompleteProfileForm() {
 
     if (result.status === "success") {
       signIn(result.data, {
-        callbackUrl: "/members",
+        callbackUrl: "/clothes",
       });
     }
   };

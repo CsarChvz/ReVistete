@@ -23,7 +23,7 @@ export default auth((req) => {
 
     if (isAuthRoute) {
         if (isLoggedIn) {
-            return NextResponse.redirect(new URL('/members', nextUrl))
+            return NextResponse.redirect(new URL('/clothes', nextUrl))
         }
         return NextResponse.next();
     }
