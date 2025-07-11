@@ -68,7 +68,7 @@ export default async function Home() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button
                     as={Link}
-                    href="/register"
+                    href="/login"
                     className="bg-gradient-to-r from-emerald-500 to-green-700 text-white text-xl px-12 py-8 rounded-full hover:opacity-90 transform hover:scale-105 transition-all shadow-xl hover:shadow-2xl"
                   >
                     Regístrate y Empieza a Intercambiar
@@ -103,7 +103,7 @@ export default async function Home() {
             {/* Puedes añadir más texto o un botón aquí */}
             <Button
               as={Link}
-              href={session ? "/clothes" : "/register"}
+              href={session ? "/clothes" : "/login"}
               className="mt-8 bg-gradient-to-r from-emerald-600 to-green-800 text-white text-lg px-8 py-4 rounded-full hover:opacity-90 transform hover:scale-105 transition-all shadow-md"
             >
               ¡Comienza tu Intercambio Sostenible Hoy!

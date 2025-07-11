@@ -89,14 +89,7 @@ export default async function TopNav() {
               >
                 Iniciar Sesión
               </Button>
-              <Button
-                as={Link}
-                href="/register"
-                variant="bordered"
-                className="text-white border-white hover:bg-white hover:text-emerald-600" // Estilo hover
-              >
-                Registrarse
-              </Button>
+
             </>
           )}
         </NavbarContent>
