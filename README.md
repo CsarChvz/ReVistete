@@ -1,4 +1,4 @@
-# ReVistete App
+# ReVistete
 
 **Intercambia, Renueva, Sostenible.**
 
@@ -8,7 +8,7 @@
 
 ## 🌐 URL de Demostración
 
-[Próximamente: Enlace a la demo en vivo de ReVistete]
+re-vistete.vercel.app/
 ---
 
 ## 🛠️ Tecnologías Utilizadas
