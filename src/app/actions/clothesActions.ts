@@ -73,13 +73,13 @@ export async function getAvailableClothes({
     const clothesWhere = {
       AND: [
         { status: ClothingStatus.AVAILABLE }, // ¡CORREGIDO: Usando el enum directamente!
-        // {
-        //   NOT: {
-        //     member: {
-        //       userId,
-        //     },
-        //   },
-        // },
+        {
+          NOT: {
+            member: {
+              userId,
+            },
+          },
+        },
 
         // @TODO: Descomentar esto
         ...(category ? [{ category: category }] : []),
@@ -138,15 +138,11 @@ export async function getUserClothingInventory(
       where: whereClause,
       skip,
       take: limit,
-      // Incluye la información del miembro si la necesitas en el ClothingCard para el inventario del propio usuario
-      // include: {
-      //   member: {
-      //     select: {
-      //       name: true,
-      //       // ...otros campos si son necesarios
-      //     },
-      //   },
-      // },
+      include: { // Incluye el miembro si lo necesitas en el card o en alguna validación posterior
+        member: {
+          select: { userId: true, name: true, image: true, city: true, country: true }
+        }
+      }
     });
 
     return {

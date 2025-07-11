@@ -69,11 +69,25 @@ export async function getMembers({
 }
 
 export async function getMemberByUserId(userId: string) {
-    try {
-        return prisma.member.findUnique({ where: { userId } })
-    } catch (error) {
-        console.log(error);
-    }
+  try {
+    return prisma.member.findUnique({
+      where: {
+        userId: userId,
+      },
+      // Selecciona los campos que necesites, incluyendo el ID del miembro
+      select: {
+        id: true, // ¡Importante! Este es el ID del Member, no el userId
+        userId: true, // El ID del User, que usamos para las relaciones en ExchangeOffer
+        name: true,
+        image: true,
+        city: true,
+        country: true,
+      }
+    });
+  } catch (error) {
+    console.error(`Error al obtener el miembro por userId ${userId}:`, error);
+    return null;
+  }
 }
 
 export async function getMemberPhotosByUserId(userId: string) {
