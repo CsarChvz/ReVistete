@@ -22,7 +22,7 @@ export default async function TopNav() {
   const memberLinks = [
     { href: "/clothes", label: "Explorar" }, // Para ver todas las prendas disponibles
     { href: "/exchange/my-offers", label: "Mis Ofertas" }, // Para ver ofertas enviadas/recibidas
-    { href: "/inventory", label: "Mi Inventario" }, // Para ver las prendas del usuario
+    { href: "/clothes/inventory", label: "Mi Inventario" }, // Para ver las prendas del usuario
   ];
 
   const adminLinks = [
@@ -89,7 +89,6 @@ export default async function TopNav() {
               >
                 Iniciar Sesión
               </Button>
-
             </>
           )}
         </NavbarContent>
