@@ -5,6 +5,7 @@ import ClothingCard from "@/app/clothes/ClothingCard"; // Reutilizamos el compon
 import PaginationComponent from "@/components/PaginationComponent";
 import EmptyState from "@/components/EmptyState";
 import { getAuthUserId } from "@/app/actions/authActions"; // Necesitamos el userId del usuario autenticado
+import { Button } from "@nextui-org/react";
 
 export default async function InventoryPage({
   searchParams,
@@ -31,6 +32,17 @@ export default async function InventoryPage({
   return (
     <>
       <h1 className="text-3xl font-semibold mb-6">Mi Inventario de Ropa</h1>
+              {session && ( // Mostrar el botón solo si el usuario está logueado
+          <Button
+            as={Link}
+            href="/clothes/new"
+            color="primary"
+            className="bg-gradient-to-r from-emerald-500 to-green-700 text-white shadow-lg"
+            size="lg"
+          >
+            Registrar Nueva Prenda
+          </Button>
+        )}
       <div className="mt-10 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
         {userClothes.map((clothingItem) => (
           <ClothingCard
