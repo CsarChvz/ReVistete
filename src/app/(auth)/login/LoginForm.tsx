@@ -61,41 +61,8 @@ export default function LoginForm() {
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
-            <Input
-              defaultValue=""
-              label="Email"
-              variant="bordered"
-              {...register("email")}
-              isInvalid={!!errors.email}
-              errorMessage={
-                errors.email?.message as string
-              }
-            />
-            <Input
-              defaultValue=""
-              label="Password"
-              variant="bordered"
-              type="password"
-              {...register("password")}
-              isInvalid={!!errors.password}
-              errorMessage={
-                errors.password?.message as string
-              }
-            />
-            <Button
-              fullWidth
-              color="default"
-              type="submit"
-              isDisabled={!isValid}
-            >
-              Login
-            </Button>
             <SocialLogin />
-            <div className="flex justify-center hover:underline text-sm">
-              <Link href="/forgot-password">
-                Forgot password?
-              </Link>
-            </div>
+
           </div>
         </form>
       </CardBody>
