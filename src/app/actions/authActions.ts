@@ -8,8 +8,13 @@ import { combinedRegisterSchema, ProfileSchema, registerSchema, RegisterSchema }
 import { generateToken, getTokenByToken } from '@/lib/tokens';
 import { ActionResult } from '@/types';
 import { TokenType, User } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { hash, verify } from 'argon2'; // <--- CAMBIO AQUÍ: Importamos hash y verify de argon2
 import { AuthError } from 'next-auth';
+
+// Función para obtener usuario por email (ya existía, pero la incluyo por contexto)
+export async function getUserByEmail(email: string) {
+    return prisma.user.findUnique({ where: { email } });
+}
 
 export async function signInUser(data: LoginSchema): Promise<ActionResult<string>> {
     try {
@@ -24,6 +29,10 @@ export async function signInUser(data: LoginSchema): Promise<ActionResult<string
 
             return { status: 'error', error: 'Please verify your email before logging in' }
         }
+
+        // Aquí no se usa directamente 'compare' o 'verify', ya que `signIn('credentials', ...)`
+        // internamente llama a la función `authorize` que ya modificamos en auth.config.ts
+        // Si el `signIn` fallara debido a credenciales, lo manejaría el `AuthError`
 
         await signIn('credentials', {
             email: data.email,
@@ -61,7 +70,7 @@ export async function registerUser(data: RegisterSchema): Promise<ActionResult<U
 
         const { name, email, password, gender, description, city, country, dateOfBirth, } = validated.data;
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await hash(password); // <--- CAMBIO AQUÍ: Usamos hash de argon2
 
         const existingUser = await prisma.user.findUnique({
             where: { email }
@@ -96,7 +105,6 @@ export async function registerUser(data: RegisterSchema): Promise<ActionResult<U
         console.log(error);
         return { status: 'error', error: 'Something went wrong' }
     }
-
 }
 
 export async function verifyEmail(token: string): Promise<ActionResult<string>> {
@@ -146,16 +154,13 @@ export async function generateResetPasswordEmail(email: string): Promise<ActionR
 
         await sendPasswordResetEmail(token.email, token.token);
 
-        return { status: 'success', data: 'Password reset email has been sent.  Please check your emails' }
+        return { status: 'success', data: 'Password reset email has been sent. Please check your emails' }
     } catch (error) {
         console.log(error);
         return { status: 'error', error: 'Something went wrong' }
     }
 }
 
-export async function getUserByEmail(email: string) {
-    return prisma.user.findUnique({ where: { email } });
-}
 
 export async function getUserById(id: string) {
     return prisma.user.findUnique({ where: { id } });
@@ -192,7 +197,7 @@ export async function resetPassword(password: string, token: string | null): Pro
             return { status: 'error', error: 'User not found' }
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await hash(password); // <--- CAMBIO AQUÍ: Usamos hash de argon2
 
         await prisma.user.update({
             where: { id: existingUser.id },
@@ -203,7 +208,7 @@ export async function resetPassword(password: string, token: string | null): Pro
             where: { id: existingToken.id }
         });
 
-        return { status: 'success', data: 'Password updated successfully.  Please try logging in' }
+        return { status: 'success', data: 'Password updated successfully. Please try logging in' }
     } catch (error) {
         console.log(error);
         return { status: 'error', error: 'Something went wrong' }
