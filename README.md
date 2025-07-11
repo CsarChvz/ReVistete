@@ -1,40 +1,48 @@
-# Match Me App
+# ReVistete App
 
-> A full-stack dating application built with Next.js 14, Prisma, NextAuth, Pusher, and Cloudinary. 
+**Intercambia, Renueva, Sostenible.**
 
-## URL
+> Una plataforma completa para el intercambio de ropa, construida con Next.js 14, Prisma, NextAuth, y Cloudinary. Promueve la moda circular y la sostenibilidad.
 
-[YouTube App Demo](https://youtu.be/HqlJjX9uIuk)
+---
 
-## Tools
+## 🌐 URL de Demostración
 
-- Next.js 14  
-- Prisma  
-- NextAuth (Auth.js)
-- Pusher  
-- Cloudinary  
-- Vercel  
-- PostgreSQL  
-- React Hook Form  
-- Zod Validation  
-- Zustand  
-- TypeScript
+[Próximamente: Enlace a la demo en vivo de ReVistete]
+---
 
+## 🛠️ Tecnologías Utilizadas
 
-## Prerequisites
+* **Frontend:** Next.js 14 (App Router), React
+* **Base de Datos:** PostgreSQL (con Prisma ORM)
+* **Autenticación:** NextAuth.js (Auth.js)
+* **Almacenamiento de Archivos:** Cloudinary
+* **Despliegue:** Vercel
+* **Gestión de Estado:** Zustand
+* **Formularios:** React Hook Form
+* **Validación de Esquemas:** Zod
+* **Tiempo Real (Opcional):** Pusher (para notificaciones de ofertas, etc.)
+* **Lenguaje:** TypeScript
 
-- Node.js (v18 or higher)
-- PostgreSQL database
+---
 
-## Installation
+## 🚀 Requisitos Previos
 
-1. Clone the repo
-2. Install packages `npm install`
-3. Set up environment variables in .env file
-4. Set up Prisma database
+Asegúrate de tener instalado lo siguiente en tu sistema:
+
+* **Node.js:** v18 o superior
+* **npm:** (viene con Node.js)
+* **PostgreSQL:** Una instancia de base de datos en ejecución (local o remota).
+* **Docker & Docker Compose:** (Opcional, para desarrollo local con contenedores)
+
+---
+
+## ⚙️ Instalación y Configuración Local
+
+Sigue estos pasos para poner la aplicación en marcha en tu entorno de desarrollo.
+
+### 1. Clonar el Repositorio
+
 ```bash
-npx prisma generate
-npx prisma migrate dev
-npx prisma db seed
-```
-5. Run the development server `npm run dev`
+git clone <URL_DE_TU_REPOSITORIO>
+cd revistete-app # O el nombre de tu carpeta de proyecto
