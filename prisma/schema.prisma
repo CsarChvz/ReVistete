@@ -8,18 +8,18 @@ datasource db {
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
+  id              String  @id @default(cuid())
+  userId          String
+  type            String
+  provider        String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  refresh_token   String? @db.Text
+  access_token    String? @db.Text
+  expires_at      Int?
+  token_type      String?
+  scope           String?
+  id_token        String? @db.Text
+  session_state   String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -40,32 +40,35 @@ model User {
 }
 
 model Member {
-  id                String    @id @default(cuid())
-  userId            String    @unique
+  id                String          @id @default(cuid())
+  userId            String          @unique
   name              String
   gender            String
   dateOfBirth       DateTime
-  created           DateTime  @default(now())
-  updated           DateTime  @default(now())
+  created           DateTime        @default(now())
+  updated           DateTime        @default(now())
   description       String
   city              String
   country           String
   image             String?
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   photos            Photo[]
-  sourceLikes       Like[]    @relation("source")
-  targetLikes       Like[]    @relation("target")
-  senderMessages    Message[] @relation("sender")
-  recipientMessages Message[] @relation("recipient")
+  sourceLikes       Like[]          @relation("source")
+  targetLikes       Like[]          @relation("target")
+  senderMessages    Message[]       @relation("sender")
+  recipientMessages Message[]       @relation("recipient")
+  clothingItems     ClothingItem[]  // Relation to the new ClothingItem model
+  sentExchangeOffers   ExchangeOffer[] @relation("offeringMember") // Exchange offers initiated by this member
+  receivedExchangeOffers ExchangeOffer[] @relation("receivingMember") // Exchange offers received by this member
 }
 
 model Photo {
-  id         String  @id @default(cuid())
-  url        String
-  publicId   String?
-  isApproved Boolean @default(false)
-  memberId   String
-  member     Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  id          String  @id @default(cuid())
+  url         String
+  publicId    String?
+  isApproved  Boolean @default(false)
+  memberId    String
+  member      Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
 }
 
 model Like {
@@ -77,17 +80,18 @@ model Like {
   @@id([sourceUserId, targetUserId])
 }
 
+
 model Message {
-  id               String    @id @default(cuid())
-  text             String
-  created          DateTime  @default(now())
-  senderId         String?
-  recipientId      String?
-  sender           Member?   @relation("sender", fields: [senderId], references: [userId], onDelete: SetNull)
-  recipient        Member?   @relation("recipient", fields: [recipientId], references: [userId], onDelete: SetNull)
-  dateRead         DateTime?
-  senderDeleted    Boolean   @default(false)
-  recipientDeleted Boolean   @default(false)
+  id                String    @id @default(cuid())
+  text              String
+  created           DateTime  @default(now())
+  senderId          String?
+  recipientId       String?
+  sender            Member?   @relation("sender", fields: [senderId], references: [userId], onDelete: SetNull)
+  recipient         Member?   @relation("recipient", fields: [recipientId], references: [userId], onDelete: SetNull)
+  dateRead          DateTime?
+  senderDeleted     Boolean   @default(false)
+  recipientDeleted  Boolean   @default(false)
 }
 
 model Token {
@@ -98,6 +102,56 @@ model Token {
   type    TokenType
 
   @@unique([email, token])
+}
+
+/// New models for clothing inventory and exchanges
+
+model ClothingItem {
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
+  category      String?
+  size          String?
+  condition     String?
+  imageUrl      String?
+  status        ClothingStatus  @default(AVAILABLE)
+  createdAt     DateTime        @default(now()) // <-- ¡AGREGADO!
+  updatedAt     DateTime        @updatedAt    // <-- ¡AGREGADO!
+  memberId      String
+  member        Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  offeredIn     ExchangeOffer[] @relation("offeredItems")
+  requestedIn   ExchangeOffer[] @relation("requestedItems")
+}
+
+model ExchangeOffer {
+  id                String          @id @default(cuid())
+  offeringMemberId  String          // The member initiating the exchange
+  offeringMember    Member          @relation("offeringMember", fields: [offeringMemberId], references: [userId])
+  receivingMemberId String          // The member receiving the exchange offer
+  receivingMember   Member          @relation("receivingMember", fields: [receivingMemberId], references: [userId])
+  offeredItemId     String          // The item being offered by the initiating member
+  offeredItem       ClothingItem    @relation("offeredItems", fields: [offeredItemId], references: [id])
+  requestedItemId   String          // The item being requested from the receiving member
+  requestedItem     ClothingItem    @relation("requestedItems", fields: [requestedItemId], references: [id])
+  status            ExchangeStatus  @default(PENDING) // Status of the exchange offer (pending, accepted, rejected, etc.)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+/// Enums for new models
+
+enum ClothingStatus {
+  AVAILABLE           // Item is available for exchange
+  EXCHANGED           // Item has been exchanged
+  UNAVAILABLE         // Item is not currently available (e.g., in use, being cleaned)
+}
+
+enum ExchangeStatus {
+  PENDING             // Offer has been sent and is awaiting response
+  ACCEPTED            // Offer has been accepted by the recipient
+  REJECTED            // Offer has been rejected by the recipient
+  CANCELED            // Offer was canceled by the sender
+  COMPLETED           // Exchange has been successfully completed (items swapped)
 }
 
 enum TokenType {
