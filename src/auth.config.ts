@@ -1,10 +1,10 @@
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import Github from "next-auth/providers/github";
-import type { NextAuthConfig } from "next-auth";
-import { loginSchema } from './lib/schemas/LoginSchema';
+import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
+import Github from "next-auth/providers/github"
+import type { NextAuthConfig } from "next-auth"
+import { loginSchema } from './lib/schemas/LoginSchema'
 import { getUserByEmail } from './app/actions/authActions';
-import { verify } from 'argon2'; // Cambiado de 'compare' de 'bcryptjs' a 'verify' de 'argon2'
+import { compare } from 'bcryptjs';
 
 export default {
     providers: [
@@ -26,8 +26,7 @@ export default {
 
                     const user = await getUserByEmail(email);
 
-                    // Aquí se usa 'verify' de argon2 en lugar de 'compare' de bcryptjs
-                    if (!user || !user.passwordHash || !(await verify(user.passwordHash, password))) return null;
+                    if (!user || !user.passwordHash || !(await compare(password, user.passwordHash))) return null;
 
                     return user;
                 }
@@ -36,4 +35,4 @@ export default {
             }
         })
     ],
-} satisfies NextAuthConfig;
+} satisfies NextAuthConfig
