@@ -58,7 +58,7 @@ export default async function Home() {
                   href="/members"
                   className="bg-gradient-to-r from-pink-500 to-red-500 text-white text-xl px-12 py-8 rounded-full hover:opacity-90 transform hover:scale-105 transition-all shadow-xl hover:shadow-2xl"
                 >
-                  Continue to Matches
+                  Continue to Clothes
                 </Button>
               ) : (
                 <div className="flex flex-col sm:flex-row gap-4">

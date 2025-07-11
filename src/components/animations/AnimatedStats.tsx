@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const stats = [
   { value: "1M+", label: "Active Users" },
-  { value: "500K", label: "Matches" },
+  { value: "500K", label: "Clothes" },
   { value: "4.8★", label: "Rating" },
 ];
 
